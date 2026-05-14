@@ -19,6 +19,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedLessonsLessonIdRouteImport } from './routes/_authenticated/lessons.$lessonId'
 import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin.students'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
+import { Route as AuthenticatedAdminLessonsRouteImport } from './routes/_authenticated/admin.lessons'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -73,12 +74,19 @@ const AuthenticatedAdminPaymentsRoute =
     path: '/payments',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminLessonsRoute =
+  AuthenticatedAdminLessonsRouteImport.update({
+    id: '/lessons',
+    path: '/lessons',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/lessons': typeof AuthenticatedAdminLessonsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/lessons/$lessonId': typeof AuthenticatedLessonsLessonIdRoute
@@ -89,6 +97,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/lessons': typeof AuthenticatedAdminLessonsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/lessons/$lessonId': typeof AuthenticatedLessonsLessonIdRoute
@@ -102,6 +111,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/admin/lessons': typeof AuthenticatedAdminLessonsRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/_authenticated/lessons/$lessonId': typeof AuthenticatedLessonsLessonIdRoute
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin'
     | '/dashboard'
+    | '/admin/lessons'
     | '/admin/payments'
     | '/admin/students'
     | '/lessons/$lessonId'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard'
+    | '/admin/lessons'
     | '/admin/payments'
     | '/admin/students'
     | '/lessons/$lessonId'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/_authenticated/admin/lessons'
     | '/_authenticated/admin/payments'
     | '/_authenticated/admin/students'
     | '/_authenticated/lessons/$lessonId'
@@ -222,16 +235,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPaymentsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/lessons': {
+      id: '/_authenticated/admin/lessons'
+      path: '/lessons'
+      fullPath: '/admin/lessons'
+      preLoaderRoute: typeof AuthenticatedAdminLessonsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminLessonsRoute: typeof AuthenticatedAdminLessonsRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminStudentsRoute: typeof AuthenticatedAdminStudentsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminLessonsRoute: AuthenticatedAdminLessonsRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminStudentsRoute: AuthenticatedAdminStudentsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
