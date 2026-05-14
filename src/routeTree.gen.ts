@@ -18,6 +18,7 @@ import { Route as AuthenticatedLessonsIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedLessonsLessonIdRouteImport } from './routes/_authenticated/lessons.$lessonId'
 import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin.students'
+import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -66,12 +67,19 @@ const AuthenticatedAdminStudentsRoute =
     path: '/students',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminPaymentsRoute =
+  AuthenticatedAdminPaymentsRouteImport.update({
+    id: '/payments',
+    path: '/payments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/lessons/$lessonId': typeof AuthenticatedLessonsLessonIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -81,6 +89,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/lessons/$lessonId': typeof AuthenticatedLessonsLessonIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -93,6 +102,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/_authenticated/lessons/$lessonId': typeof AuthenticatedLessonsLessonIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin'
     | '/dashboard'
+    | '/admin/payments'
     | '/admin/students'
     | '/lessons/$lessonId'
     | '/admin/'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard'
+    | '/admin/payments'
     | '/admin/students'
     | '/lessons/$lessonId'
     | '/admin'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/_authenticated/admin/payments'
     | '/_authenticated/admin/students'
     | '/_authenticated/lessons/$lessonId'
     | '/_authenticated/admin/'
@@ -202,15 +215,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminStudentsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/payments': {
+      id: '/_authenticated/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminStudentsRoute: typeof AuthenticatedAdminStudentsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminStudentsRoute: AuthenticatedAdminStudentsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
