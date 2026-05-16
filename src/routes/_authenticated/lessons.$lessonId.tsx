@@ -17,7 +17,7 @@ function LessonPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { data: lessons = [] } = useQuery({
+  const { data: lessons = [], isLoading: lessonsLoading } = useQuery({
     queryKey: ["lessons"],
     queryFn: async () => {
       const { data } = await supabase
