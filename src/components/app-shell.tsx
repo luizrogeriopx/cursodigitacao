@@ -27,7 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { to: "/admin/lessons", label: "Lições", icon: BookOpen },
   ];
 
-  const nav = role === "admin" ? adminNav : studentNav;
+  const isAdmin = role === "admin";
 
   const handleSignOut = async () => {
     await signOut();
