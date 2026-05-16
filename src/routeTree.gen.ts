@@ -20,6 +20,7 @@ import { Route as AuthenticatedLessonsLessonIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin.students'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedAdminLessonsRouteImport } from './routes/_authenticated/admin.lessons'
+import { Route as AuthenticatedAdminAnnouncementsRouteImport } from './routes/_authenticated/admin.announcements'
 import { Route as AuthenticatedAdminStudentsStudentIdRouteImport } from './routes/_authenticated/admin.students.$studentId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -81,6 +82,12 @@ const AuthenticatedAdminLessonsRoute =
     path: '/lessons',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAnnouncementsRoute =
+  AuthenticatedAdminAnnouncementsRouteImport.update({
+    id: '/announcements',
+    path: '/announcements',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminStudentsStudentIdRoute =
   AuthenticatedAdminStudentsStudentIdRouteImport.update({
     id: '/$studentId',
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/announcements': typeof AuthenticatedAdminAnnouncementsRoute
   '/admin/lessons': typeof AuthenticatedAdminLessonsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRouteWithChildren
@@ -105,6 +113,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/announcements': typeof AuthenticatedAdminAnnouncementsRoute
   '/admin/lessons': typeof AuthenticatedAdminLessonsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRouteWithChildren
@@ -120,6 +129,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/admin/announcements': typeof AuthenticatedAdminAnnouncementsRoute
   '/_authenticated/admin/lessons': typeof AuthenticatedAdminLessonsRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRouteWithChildren
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin'
     | '/dashboard'
+    | '/admin/announcements'
     | '/admin/lessons'
     | '/admin/payments'
     | '/admin/students'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard'
+    | '/admin/announcements'
     | '/admin/lessons'
     | '/admin/payments'
     | '/admin/students'
@@ -161,6 +173,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/_authenticated/admin/announcements'
     | '/_authenticated/admin/lessons'
     | '/_authenticated/admin/payments'
     | '/_authenticated/admin/students'
@@ -255,6 +268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLessonsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/announcements': {
+      id: '/_authenticated/admin/announcements'
+      path: '/announcements'
+      fullPath: '/admin/announcements'
+      preLoaderRoute: typeof AuthenticatedAdminAnnouncementsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/students/$studentId': {
       id: '/_authenticated/admin/students/$studentId'
       path: '/$studentId'
@@ -281,6 +301,7 @@ const AuthenticatedAdminStudentsRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAnnouncementsRoute: typeof AuthenticatedAdminAnnouncementsRoute
   AuthenticatedAdminLessonsRoute: typeof AuthenticatedAdminLessonsRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminStudentsRoute: typeof AuthenticatedAdminStudentsRouteWithChildren
@@ -288,6 +309,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAnnouncementsRoute: AuthenticatedAdminAnnouncementsRoute,
   AuthenticatedAdminLessonsRoute: AuthenticatedAdminLessonsRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminStudentsRoute: AuthenticatedAdminStudentsRouteWithChildren,

@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Keyboard, LayoutDashboard, BookOpen, Users, CreditCard, LogOut, Shield, Menu } from "lucide-react";
+import { Keyboard, LayoutDashboard, BookOpen, Users, CreditCard, LogOut, Shield, Menu, Megaphone } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -26,6 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { to: "/admin/students", label: "Alunos", icon: Users },
     { to: "/admin/payments", label: "Mensalidades", icon: CreditCard },
     { to: "/admin/lessons", label: "Lições", icon: BookOpen },
+    { to: "/admin/announcements", label: "Recados", icon: Megaphone },
   ];
 
   const isAdmin = role === "admin";
