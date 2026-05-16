@@ -23,6 +23,8 @@ export const createStudent = createServerFn({ method: "POST" })
         email: z.string().email().max(255),
         password: z.string().min(6).max(72),
         full_name: z.string().min(1).max(120),
+        phone: z.string().max(40).optional().or(z.literal("")),
+        address: z.string().max(300).optional().or(z.literal("")),
       })
       .parse(input),
   )
@@ -38,8 +40,51 @@ export const createStudent = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!created.user) throw new Error("Falha ao criar usuário");
 
-    // Trigger creates profile + 'student' role automatically (since admin already exists)
+    await supabaseAdmin
+      .from("profiles")
+      .update({
+        phone: data.phone || null,
+        address: data.address || null,
+      })
+      .eq("id", created.user.id);
+
     return { id: created.user.id, email: created.user.email };
+  });
+
+export const updateStudent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        user_id: z.string().uuid(),
+        full_name: z.string().min(1).max(120),
+        email: z.string().email().max(255),
+        phone: z.string().max(40).optional().or(z.literal("")),
+        address: z.string().max(300).optional().or(z.literal("")),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+
+    const { error: authErr } = await supabaseAdmin.auth.admin.updateUserById(
+      data.user_id,
+      { email: data.email, user_metadata: { full_name: data.full_name } },
+    );
+    if (authErr) throw new Error(authErr.message);
+
+    const { error: profErr } = await supabaseAdmin
+      .from("profiles")
+      .update({
+        full_name: data.full_name,
+        email: data.email,
+        phone: data.phone || null,
+        address: data.address || null,
+      })
+      .eq("id", data.user_id);
+    if (profErr) throw new Error(profErr.message);
+
+    return { ok: true };
   });
 
 export const deleteStudent = createServerFn({ method: "POST" })
