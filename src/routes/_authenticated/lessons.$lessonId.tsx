@@ -79,7 +79,15 @@ function LessonPage() {
     }
   };
 
-  if (!lesson) {
+  if (lessonsLoading) {
+    return (
+      <AppShell>
+        <div className="p-10 text-center text-muted-foreground">Carregando lição...</div>
+      </AppShell>
+    );
+  }
+
+  if (!lesson || !lesson.content) {
     return (
       <AppShell>
         <div className="p-10 text-center text-muted-foreground">Lição não encontrada</div>
