@@ -1,8 +1,9 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Keyboard, LayoutDashboard, BookOpen, Users, CreditCard, LogOut, Shield } from "lucide-react";
+import { Keyboard, LayoutDashboard, BookOpen, Users, CreditCard, LogOut, Shield, Menu } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 
 interface NavItem {
   to: string;
@@ -79,9 +80,51 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Keyboard className="h-5 w-5 text-primary" />
             <span className="font-semibold">Datilografia</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleSignOut}>
-            <LogOut className="h-4 w-4" />
-          </Button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Abrir menu">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="flex w-80 flex-col p-0">
+              <SheetHeader className="border-b px-6 py-5 text-left">
+                <SheetTitle className="flex items-center gap-2">
+                  <Keyboard className="h-5 w-5 text-primary" />
+                  Datilografia
+                </SheetTitle>
+              </SheetHeader>
+              <nav className="flex-1 space-y-4 overflow-y-auto p-3">
+                {isAdmin && (
+                  <NavSection title="Administração" items={adminNav} pathname={pathname} />
+                )}
+                <NavSection
+                  title={isAdmin ? "Modo aluno" : undefined}
+                  items={studentNav}
+                  pathname={pathname}
+                />
+                {isAdmin && (
+                  <div className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-xs text-accent-foreground">
+                    <Shield className="h-3.5 w-3.5" />
+                    Você é administrador
+                  </div>
+                )}
+              </nav>
+              <div className="border-t p-3">
+                <div className="mb-2 truncate px-2 text-xs text-muted-foreground">
+                  {user?.email}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sair
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </header>
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
