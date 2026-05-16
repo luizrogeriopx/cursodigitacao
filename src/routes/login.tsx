@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, type FormEvent } from "react";
 import { Keyboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { hasAnyAdmin as hasAnyAdminFn } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -21,17 +23,14 @@ function LoginPage() {
   const [mode, setMode] = useState<"signin" | "first-admin">("signin");
   const [fullName, setFullName] = useState("");
   const [hasAnyAdmin, setHasAnyAdmin] = useState<boolean | null>(null);
+  const checkHasAnyAdmin = useServerFn(hasAnyAdminFn);
 
   // Detect if there's no admin yet — allow first-admin signup
   useEffect(() => {
-    supabase
-      .from("user_roles")
-      .select("id", { count: "exact", head: true })
-      .eq("role", "admin")
-      .then(({ count }) => {
-        setHasAnyAdmin((count ?? 0) > 0);
-      });
-  }, []);
+    checkHasAnyAdmin()
+      .then((data) => setHasAnyAdmin(data.hasAnyAdmin))
+      .catch(() => setHasAnyAdmin(true));
+  }, [checkHasAnyAdmin]);
 
   useEffect(() => {
     if (!loading && session && role) {

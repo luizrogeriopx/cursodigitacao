@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback, createContext, useContext, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { getCurrentUserRole } from "@/lib/auth.functions";
 
 export type AppRole = "admin" | "student";
 
@@ -20,15 +22,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const fetchCurrentUserRole = useServerFn(getCurrentUserRole);
 
   const loadRole = useCallback(async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .maybeSingle();
-    setRole((data?.role as AppRole) ?? "student");
-  }, []);
+    try {
+      const data = await fetchCurrentUserRole();
+      if (data.userId === userId) {
+        setRole(data.role as AppRole);
+        return;
+      }
+    } catch (error) {
+      console.error("Erro ao carregar permissão do usuário", error);
+    }
+
+    setRole(null);
+  }, [fetchCurrentUserRole]);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {

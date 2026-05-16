@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { AppShell } from "@/components/app-shell";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, Circle, Lock, BookOpen, Trophy, Zap, Target } from "lucide-react";
+import { CheckCircle2, Circle, Lock, BookOpen, Trophy, Zap, Target, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -27,7 +27,7 @@ interface ProgressRow {
 }
 
 function StudentDashboard() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
 
   const { data: lessons = [] } = useQuery({
     queryKey: ["lessons"],
@@ -77,6 +77,26 @@ function StudentDashboard() {
             Continue seu treino e acompanhe seu progresso.
           </p>
         </div>
+
+        {role === "admin" && (
+          <div className="flex flex-col gap-3 rounded-xl border bg-accent p-5 text-accent-foreground sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <Shield className="mt-0.5 h-5 w-5 shrink-0" />
+              <div>
+                <h2 className="font-semibold">Conta de administrador</h2>
+                <p className="text-sm opacity-80">
+                  Você também pode gerenciar alunos, mensalidades e lições.
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/admin"
+              className="inline-flex shrink-0 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              Abrir administração
+            </Link>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid gap-4 md:grid-cols-3">
