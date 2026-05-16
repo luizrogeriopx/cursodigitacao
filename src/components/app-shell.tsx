@@ -27,7 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { to: "/admin/lessons", label: "Lições", icon: BookOpen },
   ];
 
-  const nav = role === "admin" ? adminNav : studentNav;
+  const isAdmin = role === "admin";
 
   const handleSignOut = async () => {
     await signOut();
@@ -41,29 +41,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Keyboard className="h-5 w-5 text-primary" />
           <span className="font-semibold">Datilografia</span>
         </div>
-        <nav className="flex-1 space-y-1 p-3">
-          {nav.map((item) => {
-            const active = pathname === item.to || pathname.startsWith(item.to + "/");
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                  active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
-                )}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-          {role === "admin" && (
-            <div className="mt-4 flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-xs text-accent-foreground">
+        <nav className="flex-1 space-y-4 overflow-y-auto p-3">
+          {isAdmin && (
+            <NavSection title="Administração" items={adminNav} pathname={pathname} />
+          )}
+          <NavSection
+            title={isAdmin ? "Modo aluno" : undefined}
+            items={studentNav}
+            pathname={pathname}
+          />
+          {isAdmin && (
+            <div className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-xs text-accent-foreground">
               <Shield className="h-3.5 w-3.5" />
-              Modo administrador
+              Você é administrador
             </div>
           )}
         </nav>
@@ -95,6 +85,44 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </header>
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
+    </div>
+  );
+}
+
+function NavSection({
+  title,
+  items,
+  pathname,
+}: {
+  title?: string;
+  items: NavItem[];
+  pathname: string;
+}) {
+  return (
+    <div className="space-y-1">
+      {title && (
+        <div className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {title}
+        </div>
+      )}
+      {items.map((item) => {
+        const active = pathname === item.to || pathname.startsWith(item.to + "/");
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            className={cn(
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              active
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+            )}
+          >
+            <item.icon className="h-4 w-4" />
+            {item.label}
+          </Link>
+        );
+      })}
     </div>
   );
 }
