@@ -68,7 +68,8 @@ function LessonPage() {
     );
 
     if (error) {
-      toast.error("Erro ao salvar progresso");
+      console.error("lesson_progress upsert error", error);
+      toast.error(`Erro ao salvar progresso: ${error.message}`);
       return;
     }
     queryClient.invalidateQueries({ queryKey: ["progress"] });
