@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, CheckCircle2, Circle } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/admin/students/$studentId")({
+export const Route = createFileRoute("/_authenticated/admin/students_/$studentId")({
   component: StudentProgress,
 });
 
