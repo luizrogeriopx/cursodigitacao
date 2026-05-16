@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { AnnouncementPopup } from "@/components/announcement-popup";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
@@ -24,5 +25,10 @@ function AuthenticatedLayout() {
     );
   }
 
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      <AnnouncementPopup />
+    </>
+  );
 }
