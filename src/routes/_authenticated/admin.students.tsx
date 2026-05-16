@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -7,6 +7,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -27,8 +28,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { UserPlus, Trash2, KeyRound } from "lucide-react";
-import { createStudent, deleteStudent, resetStudentPassword } from "@/lib/admin.functions";
+import { UserPlus, Trash2, KeyRound, Pencil, BarChart3 } from "lucide-react";
+import {
+  createStudent,
+  deleteStudent,
+  resetStudentPassword,
+  updateStudent,
+} from "@/lib/admin.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/students")({
@@ -39,25 +45,30 @@ interface StudentRow {
   id: string;
   full_name: string;
   email: string;
+  phone: string | null;
+  address: string | null;
   created_at: string;
 }
+
+const emptyForm = { full_name: "", email: "", password: "", phone: "", address: "" };
 
 function StudentsAdmin() {
   const queryClient = useQueryClient();
   const createFn = useServerFn(createStudent);
+  const updateFn = useServerFn(updateStudent);
   const deleteFn = useServerFn(deleteStudent);
   const resetFn = useServerFn(resetStudentPassword);
 
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ full_name: "", email: "", password: "" });
+  const [form, setForm] = useState(emptyForm);
+  const [editTarget, setEditTarget] = useState<StudentRow | null>(null);
   const [resetTarget, setResetTarget] = useState<StudentRow | null>(null);
   const [newPassword, setNewPassword] = useState("");
 
   const { data: students = [] } = useQuery({
     queryKey: ["admin-students"],
     queryFn: async () => {
-      // Get all student profiles via user_roles join
       const { data: roles } = await supabase
         .from("user_roles")
         .select("user_id")
@@ -66,7 +77,7 @@ function StudentsAdmin() {
       if (ids.length === 0) return [];
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, full_name, email, created_at")
+        .select("id, full_name, email, phone, address, created_at")
         .in("id", ids)
         .order("created_at", { ascending: false });
       return (profiles ?? []) as StudentRow[];
@@ -79,10 +90,34 @@ function StudentsAdmin() {
     try {
       await createFn({ data: form });
       toast.success("Aluno criado!");
-      setForm({ full_name: "", email: "", password: "" });
+      setForm(emptyForm);
       setOpen(false);
       queryClient.invalidateQueries({ queryKey: ["admin-students"] });
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editTarget) return;
+    setBusy(true);
+    try {
+      await updateFn({
+        data: {
+          user_id: editTarget.id,
+          full_name: editTarget.full_name,
+          email: editTarget.email,
+          phone: editTarget.phone ?? "",
+          address: editTarget.address ?? "",
+        },
+      });
+      toast.success("Aluno atualizado");
+      setEditTarget(null);
+      queryClient.invalidateQueries({ queryKey: ["admin-students"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro");
     } finally {
@@ -120,7 +155,7 @@ function StudentsAdmin() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Alunos</h1>
             <p className="mt-1 text-muted-foreground">
-              Gerencie as contas dos alunos do curso.
+              Gerencie as contas e acompanhe o progresso dos alunos.
             </p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
@@ -147,14 +182,34 @@ function StudentsAdmin() {
                     onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                   />
                 </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      required
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Telefone</Label>
+                    <Input
+                      id="phone"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                      placeholder="(11) 90000-0000"
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  <Label htmlFor="address">Endereço</Label>
+                  <Textarea
+                    id="address"
+                    rows={2}
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
@@ -183,7 +238,8 @@ function StudentsAdmin() {
             <thead className="bg-muted/50 text-left">
               <tr>
                 <th className="px-4 py-3 font-medium">Nome</th>
-                <th className="px-4 py-3 font-medium">Email</th>
+                <th className="px-4 py-3 font-medium">Contato</th>
+                <th className="px-4 py-3 font-medium">Endereço</th>
                 <th className="px-4 py-3 font-medium">Cadastro</th>
                 <th className="px-4 py-3 text-right font-medium">Ações</th>
               </tr>
@@ -191,23 +247,46 @@ function StudentsAdmin() {
             <tbody>
               {students.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-muted-foreground">
+                  <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
                     Nenhum aluno cadastrado ainda.
                   </td>
                 </tr>
               ) : (
                 students.map((s) => (
-                  <tr key={s.id} className="border-t">
+                  <tr key={s.id} className="border-t align-top">
                     <td className="px-4 py-3 font-medium">{s.full_name || "—"}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{s.email}</td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      <div>{s.email}</div>
+                      {s.phone && <div className="text-xs">{s.phone}</div>}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground max-w-[220px]">
+                      {s.address || "—"}
+                    </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {new Date(s.created_at).toLocaleDateString("pt-BR")}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex gap-1">
+                        <Button variant="ghost" size="sm" asChild title="Ver progresso">
+                          <Link
+                            to="/admin/students/$studentId"
+                            params={{ studentId: s.id }}
+                          >
+                            <BarChart3 className="h-4 w-4" />
+                          </Link>
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
+                          title="Editar"
+                          onClick={() => setEditTarget({ ...s })}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Redefinir senha"
                           onClick={() => {
                             setResetTarget(s);
                             setNewPassword("");
@@ -217,7 +296,7 @@ function StudentsAdmin() {
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" title="Remover">
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                           </AlertDialogTrigger>
@@ -245,6 +324,67 @@ function StudentsAdmin() {
             </tbody>
           </table>
         </div>
+
+        {/* Edit dialog */}
+        <Dialog open={!!editTarget} onOpenChange={(o) => !o && setEditTarget(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar aluno</DialogTitle>
+              <DialogDescription>Atualize as informações de contato.</DialogDescription>
+            </DialogHeader>
+            {editTarget && (
+              <form onSubmit={handleUpdate} className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Nome completo</Label>
+                  <Input
+                    required
+                    value={editTarget.full_name}
+                    onChange={(e) =>
+                      setEditTarget({ ...editTarget, full_name: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      required
+                      value={editTarget.email}
+                      onChange={(e) =>
+                        setEditTarget({ ...editTarget, email: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Telefone</Label>
+                    <Input
+                      value={editTarget.phone ?? ""}
+                      onChange={(e) =>
+                        setEditTarget({ ...editTarget, phone: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Endereço</Label>
+                  <Textarea
+                    rows={2}
+                    value={editTarget.address ?? ""}
+                    onChange={(e) =>
+                      setEditTarget({ ...editTarget, address: e.target.value })
+                    }
+                  />
+                </div>
+                <DialogFooter>
+                  <Button type="submit" disabled={busy}>
+                    {busy ? "Salvando..." : "Salvar"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Reset password dialog */}
         <Dialog open={!!resetTarget} onOpenChange={(o) => !o && setResetTarget(null)}>
