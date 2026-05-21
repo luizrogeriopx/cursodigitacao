@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Keyboard, Trophy, BarChart3, Users } from "lucide-react";
+import { Keyboard, Trophy, BarChart3, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -16,9 +16,14 @@ function Landing() {
             <Keyboard className="h-6 w-6 text-primary" />
             <span className="font-semibold tracking-tight">Datilografia Online</span>
           </div>
-          <Link to="/login">
-            <Button variant="default" size="sm">Entrar</Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <a href="https://wa.me/" target="_blank" rel="noopener noreferrer">
+              <Button variant="default" size="sm">Matricule-se</Button>
+            </a>
+            <Link to="/login">
+              <Button variant="outline" size="sm">Painel do aluno</Button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -36,8 +41,11 @@ function Landing() {
           Acompanhe sua evolução em tempo real com métricas de PPM e precisão.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <a href="https://wa.me/" target="_blank" rel="noopener noreferrer">
+            <Button size="lg">Matricule-se agora</Button>
+          </a>
           <Link to="/login">
-            <Button size="lg">Acessar minha conta</Button>
+            <Button size="lg" variant="outline">Painel do aluno</Button>
           </Link>
         </div>
       </section>
@@ -71,21 +79,27 @@ function Landing() {
         </div>
       </section>
 
+      {/* CTA final */}
       <section className="border-t bg-muted/30">
         <div className="mx-auto flex max-w-4xl flex-col items-center px-6 py-16 text-center">
-          <Users className="h-10 w-10 text-primary" />
-          <h2 className="mt-4 text-2xl font-bold">Para alunos e administradores</h2>
+          <Sparkles className="h-10 w-10 text-primary" />
+          <h2 className="mt-4 text-2xl font-bold">Comece hoje mesmo</h2>
           <p className="mt-3 max-w-xl text-muted-foreground">
-            O administrador gerencia alunos e mensalidades em um painel completo.
-            Cada aluno tem seu próprio espaço para praticar e acompanhar resultados.
+            Garanta sua vaga e desenvolva uma habilidade valiosa para a vida toda.
+            Aulas práticas, acompanhamento de progresso e suporte dedicado.
           </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <a href="https://wa.me/" target="_blank" rel="noopener noreferrer">
+              <Button size="lg">Matricule-se agora</Button>
+            </a>
+          </div>
         </div>
       </section>
 
       <footer className="border-t">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 text-sm text-muted-foreground">
           <span>© {new Date().getFullYear()} Datilografia Online</span>
-          <Link to="/login" className="hover:text-foreground">Entrar</Link>
+          <Link to="/login" className="hover:text-foreground">Painel do aluno</Link>
         </div>
       </footer>
     </div>
