@@ -56,14 +56,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Datilografia Online — Curso completo de digitação" },
+      { title: "Curso de Digitação Online — Curso completo de digitação" },
       {
         name: "description",
         content:
-          "Aprenda datilografia do zero ao avançado com 20 lições progressivas. Acompanhe seu progresso, velocidade e precisão.",
+          "Aprenda digitação do zero ao avançado com 20 lições progressivas. Acompanhe seu progresso, velocidade e precisão.",
       },
-      { property: "og:title", content: "Datilografia Online — Curso completo de digitação" },
-      { name: "twitter:title", content: "Datilografia Online — Curso completo de digitação" },
+      { property: "og:title", content: "Curso de Digitação Online — Curso completo de digitação" },
+      { name: "twitter:title", content: "Curso de Digitação Online — Curso completo de digitação" },
       { name: "description", content: "Online typing course platform with structured lessons, student progress tracking, and administrator dashboard for managing students and payments." },
       { property: "og:description", content: "Online typing course platform with structured lessons, student progress tracking, and administrator dashboard for managing students and payments." },
       { name: "twitter:description", content: "Online typing course platform with structured lessons, student progress tracking, and administrator dashboard for managing students and payments." },

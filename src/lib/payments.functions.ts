@@ -23,7 +23,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
             price_data: {
               currency: "brl",
               product_data: {
-                name: "Curso de Digitação Completo - Datilografia",
+                name: "Curso de Digitação Completo",
                 description: "Acesso completo e vitalício ao curso de digitação, lições estruturadas e histórico de progresso.",
               },
               unit_amount: 4700, // R$ 47,00 em centavos (4700)

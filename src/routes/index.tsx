@@ -64,7 +64,7 @@ function Landing() {
               <Keyboard className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
             </div>
             <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-              Datilografia Online
+              Curso de Digitação Online
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -295,7 +295,7 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 text-sm text-slate-500">
           <div className="flex items-center gap-2">
             <Keyboard className="h-4 w-4 text-primary" />
-            <span className="font-semibold text-slate-400">Datilografia Online</span>
+            <span className="font-semibold text-slate-400">Curso de Digitação Online</span>
             <span>© {new Date().getFullYear()}</span>
           </div>
           <div className="flex items-center gap-6">

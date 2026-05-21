@@ -178,7 +178,7 @@ function LoginPage() {
             <Keyboard className="h-6 w-6 text-primary group-hover:scale-110 transition-transform" />
           </div>
           <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-            Datilografia Online
+            Curso de Digitação Online
           </span>
         </Link>
 

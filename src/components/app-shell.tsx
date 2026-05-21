@@ -41,7 +41,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden w-64 flex-col border-r bg-sidebar md:flex">
         <div className="flex h-16 items-center gap-2 border-b px-6">
           <Keyboard className="h-5 w-5 text-primary" />
-          <span className="font-semibold">Datilografia</span>
+          <span className="font-semibold">Curso de Digitação</span>
         </div>
         <nav className="flex-1 space-y-4 overflow-y-auto p-3">
           {isAdmin && (
@@ -79,7 +79,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <header className="flex h-16 items-center justify-between border-b bg-background px-6 md:hidden">
           <div className="flex items-center gap-2">
             <Keyboard className="h-5 w-5 text-primary" />
-            <span className="font-semibold">Datilografia</span>
+            <span className="font-semibold">Curso de Digitação</span>
           </div>
           <Sheet>
             <SheetTrigger asChild>
@@ -91,7 +91,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <SheetHeader className="border-b px-6 py-5 text-left">
                 <SheetTitle className="flex items-center gap-2">
                   <Keyboard className="h-5 w-5 text-primary" />
-                  Datilografia
+                  Curso de Digitação
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex-1 space-y-4 overflow-y-auto p-3">
