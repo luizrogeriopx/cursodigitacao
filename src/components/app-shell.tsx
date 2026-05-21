@@ -77,9 +77,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex-1 flex flex-col">
         <header className="flex h-16 items-center justify-between border-b bg-background px-6 md:hidden">
-          <div className="flex items-center gap-2">
-            <Keyboard className="h-5 w-5 text-primary" />
-            <span className="font-semibold">Curso de Digitação</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <Keyboard className="h-5 w-5 text-primary shrink-0" />
+            <span className="font-semibold text-sm sm:text-base truncate">Curso de Digitação</span>
           </div>
           <Sheet>
             <SheetTrigger asChild>

@@ -127,9 +127,16 @@
 /* Typing exercise specific styles */
 .typing-text {
   font-family: var(--font-mono);
-  font-size: 1.5rem;
-  line-height: 2.25rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
   letter-spacing: 0.02em;
+}
+
+@media (min-width: 640px) {
+  .typing-text {
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+  }
 }
 
 .typing-char-pending {

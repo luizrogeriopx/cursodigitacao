@@ -63,8 +63,11 @@ function Landing() {
             <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-all duration-300">
               <Keyboard className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
             </div>
-            <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+            <span className="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent hidden sm:inline">
               Curso de Digitação Online
+            </span>
+            <span className="font-bold text-base tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent sm:hidden">
+              Digitação
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -73,7 +76,7 @@ function Landing() {
               <Button
                 onClick={handleCheckout}
                 disabled={isRedirecting || paymentsLoading}
-                className="bg-primary hover:bg-primary/90 text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg shadow-md shadow-primary/20 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50"
+                className="bg-primary hover:bg-primary/90 text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg shadow-md shadow-primary/20 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50 hidden sm:inline-flex"
               >
                 {isRedirecting ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -88,7 +91,8 @@ function Landing() {
               hasPaid ? (
                 <Link to="/dashboard">
                   <Button variant="outline" className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200">
-                    Acessar Meu Painel
+                    <span className="hidden sm:inline">Acessar Meu Painel</span>
+                    <span className="sm:hidden">Painel</span>
                   </Button>
                 </Link>
               ) : (
@@ -101,13 +105,15 @@ function Landing() {
                   {isRedirecting ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
                   ) : null}
-                  Pagar Matrícula (R$ 47)
+                  <span className="hidden sm:inline">Pagar Matrícula (R$ 47)</span>
+                  <span className="sm:hidden">Pagar</span>
                 </Button>
               )
             ) : (
               <Link to="/login">
                 <Button variant="outline" className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200">
-                  Painel do Aluno
+                  <span className="hidden sm:inline">Painel do Aluno</span>
+                  <span className="sm:hidden">Entrar</span>
                 </Button>
               </Link>
             )}
@@ -233,7 +239,7 @@ function Landing() {
           ].map((f) => (
             <div
               key={f.title}
-              className="group relative rounded-2xl border border-slate-855 bg-slate-900/40 p-8 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-700 hover:bg-slate-900/60"
+              className="group relative rounded-2xl border border-slate-800 bg-slate-900/40 p-8 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-700 hover:bg-slate-900/60"
             >
               <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${f.color} mb-6`}>
                 <f.icon className="h-6 w-6" />
@@ -292,7 +298,7 @@ function Landing() {
 
       {/* Footer */}
       <footer className="border-t border-slate-900 bg-slate-950/60 py-8 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 text-sm text-slate-500">
+        <div className="mx-auto flex max-w-6xl flex-col sm:flex-row gap-4 items-center justify-between px-6 py-6 text-sm text-slate-500">
           <div className="flex items-center gap-2">
             <Keyboard className="h-4 w-4 text-primary" />
             <span className="font-semibold text-slate-400">Curso de Digitação Online</span>

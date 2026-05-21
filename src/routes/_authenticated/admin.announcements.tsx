@@ -378,7 +378,7 @@ function AnnouncementsAdmin() {
                         href={a.link_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-1 inline-block text-xs text-primary hover:underline"
+                        className="mt-1 inline-block text-xs text-primary hover:underline break-all"
                       >
                         {a.link_url}
                       </a>
