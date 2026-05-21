@@ -1,12 +1,59 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Keyboard, Trophy, BarChart3, Sparkles } from "lucide-react";
+import { Keyboard, Trophy, BarChart3, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { createCheckoutSession } from "@/lib/payments.functions";
+import { useState } from "react";
 
 export const Route = createFileRoute("/")({
   component: Landing,
 });
 
 function Landing() {
+  const { user, role } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Consulta para verificar pagamentos do usuário logado
+  const { data: payments = [], isLoading: paymentsLoading } = useQuery({
+    queryKey: ["user-payments", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payments")
+        .select("id")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const hasPaid = payments.length > 0 || role === "admin";
+
+  const handleCheckout = async () => {
+    if (!user) {
+      // Se não estiver logado, redireciona para a página de login
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      setIsRedirecting(true);
+      const result = await createCheckoutSession();
+      if (result?.url) {
+        window.location.href = result.url;
+      } else {
+        alert("Não foi possível gerar a página de pagamento. Tente novamente.");
+      }
+    } catch (err: any) {
+      console.error("Erro no checkout:", err);
+      alert(err.message || "Erro ao processar checkout.");
+    } finally {
+      setIsRedirecting(false);
+    }
+  };
+
   return (
     <div className="dark min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-primary/30 selection:text-white">
       {/* Nav */}
@@ -21,16 +68,49 @@ function Landing() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <a href="https://wa.me/" target="_blank" rel="noopener noreferrer">
-              <Button variant="default" className="bg-primary hover:bg-primary/90 text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg shadow-md shadow-primary/20 active:scale-95 transition-all duration-200 cursor-pointer">
-                Matricule-se
+            {/* Botão de Matrícula: Oculto se já pagou */}
+            {!hasPaid && (
+              <Button
+                onClick={handleCheckout}
+                disabled={isRedirecting || paymentsLoading}
+                className="bg-primary hover:bg-primary/90 text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg shadow-md shadow-primary/20 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50"
+              >
+                {isRedirecting ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  "Matricule-se"
+                )}
               </Button>
-            </a>
-            <Link to="/login">
-              <Button variant="outline" className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200">
-                Painel do Aluno
-              </Button>
-            </Link>
+            )}
+
+            {/* Painel do Aluno: Condicional */}
+            {user ? (
+              hasPaid ? (
+                <Link to="/dashboard">
+                  <Button variant="outline" className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200">
+                    Acessar Meu Painel
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  onClick={handleCheckout}
+                  disabled={isRedirecting || paymentsLoading}
+                  variant="outline"
+                  className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200 disabled:opacity-50"
+                >
+                  {isRedirecting ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                  ) : null}
+                  Pagar Matrícula (R$ 47)
+                </Button>
+              )
+            ) : (
+              <Link to="/login">
+                <Button variant="outline" className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200">
+                  Painel do Aluno
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -39,11 +119,11 @@ function Landing() {
       <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden py-20">
         {/* Background Image with Dark Overlays */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/keyboard_background.png" 
-            alt="Teclado" 
-            className="h-full w-full object-cover opacity-35 scale-105 animate-pulse" 
-            style={{ animationDuration: '10s' }}
+          <img
+            src="/keyboard_background.png"
+            alt="Teclado"
+            className="h-full w-full object-cover opacity-35 scale-105 animate-pulse"
+            style={{ animationDuration: "10s" }}
           />
           {/* Gradients to blend the image seamlessly */}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/90" />
@@ -60,26 +140,70 @@ function Landing() {
             Curso completo · 20 lições progressivas
           </span>
           <h1 className="mt-8 text-4xl font-extrabold tracking-tight text-white sm:text-6xl md:text-7xl leading-tight">
-            Aprenda a digitar com{" "}
-            <span className="bg-gradient-to-r from-primary via-blue-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-sm block sm:inline">
-              velocidade e precisão
-            </span>
+            {hasPaid ? (
+              <>
+                Bem-vindo ao seu{" "}
+                <span className="bg-gradient-to-r from-primary via-blue-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-sm block sm:inline">
+                  Painel de Aluno
+                </span>
+              </>
+            ) : (
+              <>
+                Aprenda a digitar com{" "}
+                <span className="bg-gradient-to-r from-primary via-blue-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-sm block sm:inline">
+                  velocidade e precisão
+                </span>
+              </>
+            )}
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 md:text-xl leading-relaxed">
-            Curso estruturado em etapas progressivas, da linha guia até textos avançados.
-            Acompanhe sua evolução em tempo real com métricas de PPM e precisão.
+            {hasPaid
+              ? "Pronto para continuar? Seu painel de lições estruturadas, histórico de tentativas e relatórios de velocidade (PPM) já estão liberados para você."
+              : "Curso estruturado em etapas progressivas, da linha guia até textos avançados. Acompanhe sua evolução em tempo real com métricas de PPM e precisão."}
           </p>
           <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-            <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl shadow-lg shadow-primary/30 active:scale-[0.98] transition-all duration-200 cursor-pointer">
-                Matricule-se agora
-              </Button>
-            </a>
-            <Link to="/login" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full border-slate-800 bg-slate-900/40 hover:bg-slate-900 text-slate-200 hover:text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl backdrop-blur-sm active:scale-[0.98] transition-all duration-200">
-                Painel do Aluno
-              </Button>
-            </Link>
+            {!hasPaid ? (
+              <>
+                <Button
+                  size="lg"
+                  onClick={handleCheckout}
+                  disabled={isRedirecting || paymentsLoading}
+                  className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl shadow-lg shadow-primary/30 active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50"
+                >
+                  {isRedirecting && (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  )}
+                  Matricule-se agora
+                </Button>
+
+                {user ? (
+                  <Button
+                    size="lg"
+                    onClick={handleCheckout}
+                    disabled={isRedirecting || paymentsLoading}
+                    variant="outline"
+                    className="w-full sm:w-auto border-slate-800 bg-slate-900/40 hover:bg-slate-900 text-slate-200 hover:text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl backdrop-blur-sm active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+                  >
+                    {isRedirecting && (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    )}
+                    Pagar Matrícula (R$ 47)
+                  </Button>
+                ) : (
+                  <Link to="/login" className="w-full sm:w-auto">
+                    <Button size="lg" variant="outline" className="w-full border-slate-800 bg-slate-900/40 hover:bg-slate-900 text-slate-200 hover:text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl backdrop-blur-sm active:scale-[0.98] transition-all duration-200">
+                      Painel do Aluno
+                    </Button>
+                  </Link>
+                )}
+              </>
+            ) : (
+              <Link to="/dashboard" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl shadow-lg shadow-primary/30 active:scale-[0.98] transition-all duration-200 cursor-pointer">
+                  Acessar Meu Painel
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -107,15 +231,19 @@ function Landing() {
               color: "from-amber-500/20 to-orange-500/20 text-amber-400",
             },
           ].map((f) => (
-            <div 
-              key={f.title} 
-              className="group relative rounded-2xl border border-slate-850 bg-slate-900/40 p-8 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-700 hover:bg-slate-900/60"
+            <div
+              key={f.title}
+              className="group relative rounded-2xl border border-slate-855 bg-slate-900/40 p-8 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-700 hover:bg-slate-900/60"
             >
               <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${f.color} mb-6`}>
                 <f.icon className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">{f.title}</h3>
-              <p className="mt-3 text-slate-400 text-sm leading-relaxed">{f.text}</p>
+              <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">
+                {f.title}
+              </h3>
+              <p className="mt-3 text-slate-400 text-sm leading-relaxed">
+                {f.text}
+              </p>
             </div>
           ))}
         </div>
@@ -131,18 +259,33 @@ function Landing() {
             <Sparkles className="h-8 w-8 text-primary" />
           </div>
           <h2 className="mt-8 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            Comece hoje mesmo
+            {hasPaid ? "Bons Treinos!" : "Comece hoje mesmo"}
           </h2>
           <p className="mt-4 max-w-xl text-slate-400 text-base leading-relaxed">
-            Garanta sua vaga e desenvolva uma habilidade valiosa para a vida toda.
-            Aulas práticas, acompanhamento de progresso e suporte dedicado.
+            {hasPaid
+              ? "Você já concluiu sua matrícula e tem acesso vitalício a toda a plataforma. Treine diariamente para aperfeiçoar sua digitação!"
+              : "Garanta seu acesso vitalício e desenvolva uma habilidade valiosa para a vida toda. Aulas práticas, acompanhamento de progresso e suporte."}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <a href="https://wa.me/" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl shadow-lg shadow-primary/30 active:scale-95 transition-all duration-200 cursor-pointer">
+            {hasPaid ? (
+              <Link to="/dashboard">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl shadow-lg shadow-primary/30 active:scale-95 transition-all duration-200 cursor-pointer">
+                  Acessar Meu Painel
+                </Button>
+              </Link>
+            ) : (
+              <Button
+                size="lg"
+                onClick={handleCheckout}
+                disabled={isRedirecting || paymentsLoading}
+                className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl shadow-lg shadow-primary/30 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50"
+              >
+                {isRedirecting && (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                )}
                 Matricule-se agora
               </Button>
-            </a>
+            )}
           </div>
         </div>
       </section>
@@ -156,15 +299,34 @@ function Landing() {
             <span>© {new Date().getFullYear()}</span>
           </div>
           <div className="flex items-center gap-6">
-            <Link to="/login" className="hover:text-primary transition-colors font-semibold uppercase text-xs tracking-wider">
-              Painel do Aluno
-            </Link>
-            <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors font-semibold uppercase text-xs tracking-wider">
-              Matricule-se
-            </a>
+            {user ? (
+              hasPaid ? (
+                <Link to="/dashboard" className="hover:text-primary transition-colors font-semibold uppercase text-xs tracking-wider">
+                  Meu Painel
+                </Link>
+              ) : (
+                <button
+                  onClick={handleCheckout}
+                  disabled={isRedirecting || paymentsLoading}
+                  className="hover:text-primary transition-colors font-semibold uppercase text-xs tracking-wider disabled:opacity-50 cursor-pointer"
+                >
+                  Realizar Pagamento
+                </button>
+              )
+            ) : (
+              <>
+                <Link to="/login" className="hover:text-primary transition-colors font-semibold uppercase text-xs tracking-wider">
+                  Painel do Aluno
+                </Link>
+                <Link to="/login" className="hover:text-primary transition-colors font-semibold uppercase text-xs tracking-wider">
+                  Matricule-se
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </footer>
     </div>
   );
 }
+
