@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import Stripe from "stripe";
 
 export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -10,7 +9,9 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       throw new Error("STRIPE_SECRET_KEY não configurada no servidor");
     }
 
-    // Inicializa o Stripe sem especificar versão para usar a versão padrão do SDK instalado
+    // Importa o Stripe dinamicamente apenas no servidor para evitar quebrar o cliente
+    const StripeModule = await import("stripe");
+    const Stripe = StripeModule.default;
     const stripe = new Stripe(stripeSecretKey);
 
     const appUrl = process.env.APP_URL || "http://localhost:8080";
