@@ -158,19 +158,6 @@ function LoginPage() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin,
-        },
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      toast.error(err.message || "Erro no login social");
-    }
-  };
 
   return (
     <div className="dark min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-primary/30 selection:text-white flex flex-col items-center justify-center px-4 relative overflow-hidden py-12">
@@ -456,28 +443,7 @@ function LoginPage() {
             </>
           )}
 
-          {/* Social Sign In (Only for non-first-admin setups) */}
-          {mode !== "first-admin" && (
-            <div className="mt-6">
-              <div className="relative flex items-center justify-center my-4">
-                <div className="absolute border-t border-slate-900 w-full" />
-                <span className="relative bg-slate-950 px-3 text-[10px] text-slate-500 uppercase tracking-wider">
-                  Ou continue com
-                </span>
-              </div>
 
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                className="w-full border border-slate-800 bg-slate-900/30 hover:bg-slate-900 text-slate-200 hover:text-white font-medium py-2 rounded-xl transition-all duration-200 flex items-center justify-center text-sm cursor-pointer"
-              >
-                <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-                  <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
-                </svg>
-                Google
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>
