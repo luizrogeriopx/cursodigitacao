@@ -25,17 +25,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchCurrentUserRole = useServerFn(getCurrentUserRole);
 
   const loadRole = useCallback(async (userId: string) => {
+    setLoading(true);
     try {
       const data = await fetchCurrentUserRole();
       if (data.userId === userId) {
         setRole(data.role as AppRole);
-        return;
+      } else {
+        setRole(null);
       }
     } catch (error) {
       console.error("Erro ao carregar permissão do usuário", error);
+      setRole(null);
+    } finally {
+      setLoading(false);
     }
-
-    setRole(null);
   }, [fetchCurrentUserRole]);
 
   useEffect(() => {
@@ -47,13 +50,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }, 0);
       } else {
         setRole(null);
+        setLoading(false);
       }
     });
 
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       if (data.session?.user) {
-        loadRole(data.session.user.id).finally(() => setLoading(false));
+        loadRole(data.session.user.id);
       } else {
         setLoading(false);
       }

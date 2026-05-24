@@ -19,13 +19,15 @@ export const getCurrentUserRole = createServerFn({ method: "GET" })
     const { data, error } = await supabaseAdmin
       .from("user_roles")
       .select("role")
-      .eq("user_id", context.userId)
-      .maybeSingle();
+      .eq("user_id", context.userId);
 
     if (error) throw new Error("Não foi possível carregar seu tipo de conta");
 
+    const roles = (data ?? []).map((r) => r.role);
+    const isUserAdmin = roles.includes("admin");
+
     return {
       userId: context.userId,
-      role: data?.role === "admin" ? "admin" : "student",
+      role: isUserAdmin ? "admin" : "student",
     };
   });

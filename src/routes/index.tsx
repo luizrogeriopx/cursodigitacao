@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
-  const { user, role } = useAuth();
+  const { user, role, loading: authLoading } = useAuth();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Consulta para verificar pagamentos do usuário logado
@@ -71,51 +71,60 @@ function Landing() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            {/* Botão de Matrícula: Oculto se já pagou */}
-            {!hasPaid && (
-              <Button
-                onClick={handleCheckout}
-                disabled={isRedirecting || paymentsLoading}
-                className="bg-primary hover:bg-primary/90 text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg shadow-md shadow-primary/20 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50 hidden sm:inline-flex"
-              >
-                {isRedirecting ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  "Matricule-se"
-                )}
+            {authLoading || (user && paymentsLoading) ? (
+              <Button disabled variant="outline" className="border-slate-800 bg-slate-900/50 text-slate-400 font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg opacity-50">
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                Carregando...
               </Button>
-            )}
-
-            {/* Painel do Aluno: Condicional */}
-            {user ? (
-              hasPaid ? (
-                <Link to="/dashboard">
-                  <Button variant="outline" className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200">
-                    <span className="hidden sm:inline">Acessar Meu Painel</span>
-                    <span className="sm:hidden">Painel</span>
-                  </Button>
-                </Link>
-              ) : (
-                <Button
-                  onClick={handleCheckout}
-                  disabled={isRedirecting || paymentsLoading}
-                  variant="outline"
-                  className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200 disabled:opacity-50"
-                >
-                  {isRedirecting ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-                  ) : null}
-                  <span className="hidden sm:inline">Pagar Matrícula (R$ 47)</span>
-                  <span className="sm:hidden">Pagar</span>
-                </Button>
-              )
             ) : (
-              <Link to="/login">
-                <Button variant="outline" className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200">
-                  <span className="hidden sm:inline">Painel do Aluno</span>
-                  <span className="sm:hidden">Entrar</span>
-                </Button>
-              </Link>
+              <>
+                {/* Botão de Matrícula: Oculto se já pagou */}
+                {!hasPaid && (
+                  <Button
+                    onClick={handleCheckout}
+                    disabled={isRedirecting}
+                    className="bg-primary hover:bg-primary/90 text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg shadow-md shadow-primary/20 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50 hidden sm:inline-flex"
+                  >
+                    {isRedirecting ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      "Matricule-se"
+                    )}
+                  </Button>
+                )}
+
+                {/* Painel do Aluno: Condicional */}
+                {user ? (
+                  hasPaid ? (
+                    <Link to="/dashboard">
+                      <Button variant="outline" className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200">
+                        <span className="hidden sm:inline">Acessar Meu Painel</span>
+                        <span className="sm:hidden">Painel</span>
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button
+                      onClick={handleCheckout}
+                      disabled={isRedirecting}
+                      variant="outline"
+                      className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200 disabled:opacity-50"
+                    >
+                      {isRedirecting ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                      ) : null}
+                      <span className="hidden sm:inline">Pagar Matrícula (R$ 47)</span>
+                      <span className="sm:hidden">Pagar</span>
+                    </Button>
+                  )
+                ) : (
+                  <Link to="/login">
+                    <Button variant="outline" className="border-slate-800 bg-slate-900/50 hover:bg-slate-900 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase px-4 py-2 h-9 rounded-lg active:scale-95 transition-all duration-200">
+                      <span className="hidden sm:inline">Painel do Aluno</span>
+                      <span className="sm:hidden">Entrar</span>
+                    </Button>
+                  </Link>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -168,12 +177,17 @@ function Landing() {
               : "Curso estruturado em etapas progressivas, da linha guia até textos avançados. Acompanhe sua evolução em tempo real com métricas de PPM e precisão."}
           </p>
           <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-            {!hasPaid ? (
+            {authLoading || (user && paymentsLoading) ? (
+              <Button size="lg" disabled variant="outline" className="w-full sm:w-auto border-slate-800 bg-slate-900/40 text-slate-400 font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl backdrop-blur-sm opacity-50">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Carregando...
+              </Button>
+            ) : !hasPaid ? (
               <>
                 <Button
                   size="lg"
                   onClick={handleCheckout}
-                  disabled={isRedirecting || paymentsLoading}
+                  disabled={isRedirecting}
                   className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl shadow-lg shadow-primary/30 active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50"
                 >
                   {isRedirecting && (
@@ -186,7 +200,7 @@ function Landing() {
                   <Button
                     size="lg"
                     onClick={handleCheckout}
-                    disabled={isRedirecting || paymentsLoading}
+                    disabled={isRedirecting}
                     variant="outline"
                     className="w-full sm:w-auto border-slate-800 bg-slate-900/40 hover:bg-slate-900 text-slate-200 hover:text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl backdrop-blur-sm active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
                   >
@@ -273,7 +287,12 @@ function Landing() {
               : "Garanta seu acesso vitalício e desenvolva uma habilidade valiosa para a vida toda. Aulas práticas, acompanhamento de progresso e suporte."}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {hasPaid ? (
+            {authLoading || (user && paymentsLoading) ? (
+              <Button size="lg" disabled variant="outline" className="border-slate-800 bg-slate-900/40 text-slate-400 font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl backdrop-blur-sm opacity-50">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Carregando...
+              </Button>
+            ) : hasPaid ? (
               <Link to="/dashboard">
                 <Button size="lg" className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl shadow-lg shadow-primary/30 active:scale-95 transition-all duration-200 cursor-pointer">
                   Acessar Meu Painel
@@ -283,7 +302,7 @@ function Landing() {
               <Button
                 size="lg"
                 onClick={handleCheckout}
-                disabled={isRedirecting || paymentsLoading}
+                disabled={isRedirecting}
                 className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider px-8 py-6 text-sm rounded-xl shadow-lg shadow-primary/30 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50"
               >
                 {isRedirecting && (

@@ -159,3 +159,8 @@
 @keyframes blink {
   50% { background-color: transparent; }
 }
+
+/* Mascarar o botão flutuante 'Edit With Lovable' */
+#lovable-badge {
+  display: none !important;
+}
